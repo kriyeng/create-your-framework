@@ -55,7 +55,7 @@ function renderResults(pictures, type) {
     var list = document.querySelector('#' + type + '-list');
     list.innerHTML = '';
     if(pictures && pictures.items) {
-        pictures.items.map(function(item) {
+        pictures.items.forEach(function(item) {
             var newDiv = document.createElement("div");
             newDiv.classList.add('item');
             newDiv.classList.add('panel');
