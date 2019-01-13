@@ -1,0 +1,13 @@
+logs
+*.log
+pids
+node_modules/
+.idea/
+.npm
+*.dat
+config.js
+databases/
+config
+tmp/
+mongoose-free-6.9.exe
+pixabay-config.js

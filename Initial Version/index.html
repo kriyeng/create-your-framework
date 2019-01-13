@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>My Pixabay Browser</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
+    <link rel="stylesheet" href="https://use.fontawesome.com/releases/v5.5.0/css/all.css">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:400,500,700" rel="stylesheet">
+
+    <link rel="stylesheet" href="css/app.css">
+
+</head>
+<body>
+    <div class="panel" id="header">
+        <div class="picture">
+            My Pixabay Browser
+        </div>
+        <div class="nav-bar" id="menu-buttons">
+            <div class="button">Home</div>
+            <div class="button selected">Photos</div>
+            <div class="button">Videos</div>
+        </div>
+    </div>
+
+    <div id="content">
+        <div class="tab home">
+            <div class="top-bar">
+                <div class="title"><span class="fa fa-home"></span> Welcome to Pixabay Photo and Video Browser!</div>
+            </div>
+            <div class="panel">
+                <div class="illustration">
+                    <img src="img/templates.png" />
+                    <div class="comment">Ready to start creating your own templates system!</div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab photos selected">
+            <div class="top-bar">
+                <div class="title"><span class="fa fa-home"></span> Search Photos!</div>
+                <div class="search-bar">
+                    <input type="text" placeholder="type your search here" onkeyup="searchKeyUp(event, 'photos');" />
+                    <span class="fa fa-search"></span>
+                </div>
+            </div>
+            <div id="photos-list" class="list">
+                <div class="item panel">
+                    <div class="image" style="background-image: url('img/pix1.jpg')"></div>
+                    <div class="details">
+                        <div class="user">
+                            <div class="thumb" style="background-image: url('img/user.png')"></div>
+                            <div>user name</div>
+                        </div>
+                        <div class="views"><span class="fa fa-eye"></span> 1000</div>
+                        <div class="likes"><span class="fa fa-heart"></span> 15</div>
+                    </div>
+                </div>
+                <div class="item panel">
+                    <div class="image" style="background-image: url('img/pix2.jpg')"></div>
+                    <div class="details">
+                        <div class="user">
+                            <div class="thumb" style="background-image: url('img/user.png')"></div>
+                            <div>user name</div>
+                        </div>
+                        <div class="views"><span class="fa fa-eye"></span> 1000</div>
+                        <div class="likes"><span class="fa fa-heart"></span> 15</div>
+                    </div>
+                </div>
+                <div class="item panel">
+                    <div class="image" style="background-image: url('img/pix3.jpg')"></div>
+                    <div class="details">
+                        <div class="user">
+                            <div class="thumb" style="background-image: url('img/user.png')"></div>
+                            <div>user name</div>
+                        </div>
+                        <div class="views"><span class="fa fa-eye"></span> 1000</div>
+                        <div class="likes"><span class="fa fa-heart"></span> 15</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="tab videos">
+            <div class="top-bar">
+                <div class="title"><span class="fa fa-home"></span> Search Videos!</div>
+                <div class="search-bar">
+                    <input type="text" placeholder="type your search here" onkeyup="searchKeyUp(event, 'videos');" />
+                    <span class="fa fa-search"></span>
+                </div>
+            </div>
+            <div id="videos-list" class="list">
+            </div>
+        </div>
+    </div>
+    <script type="text/javascript" src="js/ajax.js"></script>
+    <script type="text/javascript" src="js/pixabay-config.js"></script>
+    <script type="text/javascript" src="js/pixabay-api.js"></script>
+    <script type="text/javascript" src="js/app.js"></script>
+</body>
+</html>
