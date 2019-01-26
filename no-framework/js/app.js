@@ -52,14 +52,27 @@ function searchKeyUp(e, type){
 }
 
 function renderResults(pictures, type) {
+
+    // Select the list of photos or the list of videos depending on the type received
     var list = document.querySelector('#' + type + '-list');
+
+    // We reset the list
     list.innerHTML = '';
+
+    // If we received results and there are items
     if(pictures && pictures.items) {
+
+        // We iterate for the entire items
         pictures.items.forEach(function(item) {
+
+            // Create a new DIV element
             var newDiv = document.createElement("div");
+
+            // We add two classes for styling to our new div
             newDiv.classList.add('item');
             newDiv.classList.add('panel');
 
+            // We fill the HTML for the new div using a concatenating a string and dynamic data
             newDiv.innerHTML = '    <div class="image" style="background-image: url(\'' + item.preview+ '\')"></div>' +
                 '    <div class="details">' +
                 '        <div class="user">' +
@@ -70,6 +83,7 @@ function renderResults(pictures, type) {
                 '        <div class="likes"><span class="fa fa-heart"></span> ' + formatTotals(item.likes) + '</div>' +
                 '    </div>';
 
+            // We append the new div to the selected list
             list.append(newDiv);
         })
     }

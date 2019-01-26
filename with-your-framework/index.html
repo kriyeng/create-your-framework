@@ -96,6 +96,21 @@
     <script type="text/javascript" src="js/ajax.js"></script>
     <script type="text/javascript" src="js/pixabay-config.js"></script>
     <script type="text/javascript" src="js/pixabay-api.js"></script>
+    <script type="text/javascript" src="js/dynamic-template.js"></script>
     <script type="text/javascript" src="js/app.js"></script>
+
+    <script type="text/template" id="template-item">
+        <div class="item panel">
+            <div class="image" style="background-image: url({{item.preview}})"></div>
+            <div class="details">
+                <div class="user">
+                    <div class="thumb" style="background-image: url({{item.user_img}})"></div>
+                    <div>{{item.user}}</div>
+                </div>
+                <div class="views"><span class="fa fa-eye"></span> {{item.views}}</div>
+                <div class="likes"><span class="fa fa-heart"></span> {{item.likes}}</div>
+            </div>
+        </div>
+    </script>
 </body>
 </html>
