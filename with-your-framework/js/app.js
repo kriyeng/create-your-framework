@@ -64,7 +64,7 @@ function renderResults(pictures, type) {
 
         // We iterate for the entire items
         list.innerHTML = pictures.items.reduce(function(str_html, item) {
-            // Appends the new item to the list
+            // Appends the new item to the list calling our new dynamic template render function
             return str_html + dt.render('template-item', { item : item });
         }, '');
     }

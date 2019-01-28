@@ -24,28 +24,29 @@
     // We create a function to replace the curly braces with data values
     function applyDynamicValues(str_html, object){
         // Iterates over all the dynamic queries found and replace by its values
-        return getDynamicValues(str_html).reduce(function(html, dyn_value){
+        return getDynamicVariables(str_html).reduce(function(html, dyn_value){
 
             // Creates a regex to replace the value for each element found
             var regexp = new RegExp("{{" + dyn_value + "}}", 'g');
 
             // Gets the value of the dynamic query
-            var value = getValueFromObject(dyn_value, object);
+            var value = getValue(dyn_value, object);
 
             // Apply the replace to all items in the original HTML string
             return html.replace(regexp, value !== null ? value : '');
         }, str_html);
     }
 
-    function getDynamicValues(str){
+    // Extract the dynamic values queried in curly braces
+    function getDynamicVariables(str){
 
         // Regex Explanation:
         // (?<={{) Require opening curly braces before match, but not include in the result
-        // ([^}]*) Accept all characters except }
+        // ([^]*?) Accept the minimum string length before the next condition below.
         // (?=}}) - Require closing curly braces after match
 
         // Returns matches or an empty array if there's no matches
-        var result = (str.match(/(?<={{)([^}]*)(?=}})/g) || []);
+        var result = (str.match(/(?<={{)([^]*?)(?=}})/g) || []);
 
         // Filter the results to remove duplicates
         return result.filter(function(item, pos) {
@@ -53,6 +54,64 @@
         })
     }
 
+function getValue(var_string, object){
+
+    //Check if the dynamic variable is the type {{if:condition:value1:value2}}
+    if (var_string.indexOf('if:') > -1) {
+        // Retrieves the value from the conditional
+        return getValueFromConditional(var_string, object);
+    } else {
+        // Retrieves the value directly from the object
+        return getValueFromObject(var_string, object);
+    }
+}
+
+// Analize the condition: {{if:some-value:operator:value:option1:option2}}
+function getValueFromConditional(str_condition, object){
+
+    // Split conditional parameters into arrey
+    var condition = str_condition.split(':');
+
+    // We get the value from the object to compare {{if:SOME-VALUE:operator:value:option1:option2}}
+    var variable_value = getValueFromObject(condition[1], object);
+
+    // We convert to native primitives of string values {{if:some-value:operator:VALUE:option1:option2}}
+    condition[3] = condition[3] === "null" ? null : condition[3];
+    condition[3] = condition[3] === "true" ? true : condition[3];
+
+    // for the conditional values we can use objects indicated by {@object.property@} on {{if:some-value:operator:value:OPTION1:OPTION2}}
+    condition[4] = checkVariableInContent(condition[4], object);
+    condition[5] = checkVariableInContent(condition[5], object);
+
+    // Finally we compute the conditional based on the operator {{if:some-value:OPERATOR:value:option1:option2}}
+    // We use 'is' to compare values to true like: item.name ? 'value if true' : 'value if false'
+    switch(condition[2]){
+        case 'is':
+            return variable_value ? condition[4] : condition[5];
+        case '==':
+            return (condition[3] == variable_value) ? condition[4] : condition[5];
+        case '!=':
+            return (condition[3] != variable_value) ? condition[4] : condition[5];
+        case '>':
+            return (condition[3] > variable_value) ? condition[4] : condition[5];
+        case '<':
+            return (condition[3] < variable_value) ? condition[4] : condition[5];
+        case '<=':
+            return (condition[3] <= variable_value) ? condition[4] : condition[5];
+    }
+}
+
+    // We check if condition values has reference to the object to get dynamic data
+    function checkVariableInContent(condition, object){
+
+        // Check if the values contains expressions to evaluate expressed as {@object@} or {@object.property@}
+        var expr = condition.match(/{@(.*?)@}/);
+
+        // Replace the expression by its value found in the object or return the string as it is
+        return expr ? condition.replace(expr[0],getValueFromObject(expr[1], object)) : condition;
+    }
+
+    // Gets the value from the data
     function getValueFromObject(str_property, object){
         // Clean white spaces
         str_property=str_property.trim();

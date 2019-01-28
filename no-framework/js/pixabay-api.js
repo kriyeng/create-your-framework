@@ -22,7 +22,7 @@
                 var items = [];
                 result.hits.forEach(function (item) {
                     items.push({
-                            type : 'cloud',
+                            type : 'photo',
                             preview : item.previewURL,
                             url : item.fullHDURL,
                             user : item.user,
@@ -52,7 +52,7 @@
                 var items = [];
                 result.hits.forEach(function (item) {
                     items.push({
-                        type : 'cloud',
+                        type : 'video',
                         preview : 'https://i.vimeocdn.com/video/' + item.picture_id + '_250x150.jpg',
                         url : item.videos.large.url,
                         user : item.user,
