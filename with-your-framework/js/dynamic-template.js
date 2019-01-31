@@ -27,7 +27,7 @@
         return getDynamicVariables(str_html).reduce(function(html, dyn_value){
 
             // Creates a regex to replace the value for each element found
-            var regexp = new RegExp("{{" + dyn_value + "}}", 'g');
+            var regexp = new RegExp("{{" + dyn_value.replace('(','\\(').replace(')','\\)') + "}}", 'g');
 
             // Gets the value of the dynamic query
             var value = getValue(dyn_value, object);
@@ -60,8 +60,9 @@ function getValue(var_string, object){
     if (var_string.indexOf('if:') > -1) {
         // Retrieves the value from the conditional
         return getValueFromConditional(var_string, object);
+    } else if (var_string.indexOf('compute:') > -1) {
+        return getValueFromCompute(var_string, object);
     } else {
-        // Retrieves the value directly from the object
         return getValueFromObject(var_string, object);
     }
 }
@@ -135,6 +136,45 @@ function getValueFromConditional(str_condition, object){
         }
 
         return value;
+    }
+
+    function getValueFromCompute(str_compute, object) {
+
+        var regex = /compute:([\w.]*)\((.*)\)/;     // compute:function_name(parameters) -> we create 2 group matches, one for the fn name an another for the parameters
+        var parts = regex.exec(str_compute);
+        var fn = parts[1];
+
+        // Analize the parameters passed to the function
+        var values = parts[2].split(',').map(function(parameter, index){
+
+            // cleaning white spaces
+            parameter = parameter.trim();
+
+            // Returning the value. If string, removing the ', if object, get the property of the object
+            return parameter.indexOf('\'') > -1 ? parameter.replace(/\'/g, '') : getValueFromObject(parameter, object);
+        });
+
+        if(typeof window[fn] === "function"){
+            return window[fn](values);
+        }else {
+            if(fn.indexOf('.')>-1){
+
+                // we break function into properties based on dot notations. object.props0.props1
+                var props = fn.split('.');
+
+                // We verify if object.firstField exists and object.firstField.secondField if it is a function
+                // If not we check if window.firstField exists and window.firstField.secondField if it is a function
+                if (object[props[0]] && typeof object[props[0]][props[1]] === "function") {
+                    return object[props[0]][props[1]].apply(object[props[0]], values);
+                } else if(window[props[0]] && typeof window[props[0]][props[1]] === "function") {
+                    return window[props[0]][props[1]].apply(window[props[0]], values);
+                } else {
+                    // We create an advice that we are using a not existing function on this template
+                    console.log("Error: " + str_compute + " is not a function");
+                }
+            }
+            console.log("Error: " + str_compute + " is not a function");
+        }
     }
 
     window.dt = dynamicTemplate;

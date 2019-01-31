@@ -99,18 +99,18 @@
     <script type="text/javascript" src="js/dynamic-template.js"></script>
     <script type="text/javascript" src="js/app.js"></script>
 
-    <script type="text/template" id="template-item">
-        <div class="item panel {{if:item.type:==:photo:photo-class:video-class}}">
-            <div class="image" style="background-image: url({{item.preview}})"></div>
-            <div class="details">
-                <div class="user">
-                    <div class="thumb" style="background-image: url({{item.user_img}})"></div>
-                    <div>{{item.user}}</div>
-                </div>
-                <div class="views"><span class="fa fa-eye"></span> {{item.views}}</div>
-                <div class="likes"><span class="fa fa-heart"></span> {{item.likes}}</div>
+<script type="text/template" id="template-item">
+    <div class="item panel {{if:item.type:==:photo:photo-class:video-class}}">
+        <div class="image" style="background-image: url({{item.preview}})"></div>
+        <div class="details">
+            <div class="user">
+                <div class="thumb" style="background-image: url({{item.user_img}})"></div>
+                <div>{{item.user}}</div>
             </div>
+            <div class="views"><span class="fa fa-eye"></span> {{compute:formatTotals(item.views)}}</div>
+            <div class="likes"><span class="fa fa-heart"></span> {{compute:formatTotals(item.likes)}}</div>
         </div>
-    </script>
+    </div>
+</script>
 </body>
 </html>
