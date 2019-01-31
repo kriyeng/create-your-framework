@@ -1,5 +1,5 @@
 # Create your own framewrok in less than 350 lines of code
-This repo contains all the code used in the tutorial "Create your own framework in less than 300 lines of code". You can find the tutorial in [my blog](http://blog.ibanyez.info)
+This repo contains all the code used in the tutorial "Create your own framework in less than 350 lines of code". You can find the tutorial in [my blog](http://blog.ibanyez.info)
 
 ### Install
 This application doesn't need any server. Just open index.html on each folder on your browser to run the app.
