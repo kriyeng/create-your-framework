@@ -6,19 +6,25 @@
     };
 
     // Gets the template, finds dynamic value queries, replaces with its value and return a string of the new HTML
-    function render(template_selector, object){
+    function render(template_selector, object) {
 
         // Similar as jQuery we distinct with a $ the variables that contains HTMLElements.
         // This can help to distinguish when you are dealing with strings or HTMLElements
         var $template = document.getElementById(template_selector);
 
         // Check if template exists
-        if(!$template){
+        if (!$template) {
             console.error("Template doesn't exists! Check Your template Selector: " + template_selector);
             return '';
         }
 
-        return applyDynamicValues($template.innerHTML, object);
+        return applyTemplate($template, object);
+    }
+
+    function applyTemplate($template, object) {
+        var str_html = $template.outerHTML.substr(0,30).indexOf('script')>-1 ? $template.innerHTML : $template.outerHTML;
+        str_html = applyIterates(str_html, object);
+        return applyDynamicValues(str_html, object);
     }
 
     // We create a function to replace the curly braces with data values
@@ -76,9 +82,12 @@ function getValueFromConditional(str_condition, object){
     // We get the value from the object to compare {{if:SOME-VALUE:operator:value:option1:option2}}
     var variable_value = getValueFromObject(condition[1], object);
 
-    // We convert to native primitives of string values {{if:some-value:operator:VALUE:option1:option2}}
-    condition[3] = condition[3] === "null" ? null : condition[3];
-    condition[3] = condition[3] === "true" ? true : condition[3];
+    // We convert some possible string value to the javascript primitives {{if:some-value:operator:COMPARING-VALUE:option1:option2}}
+    switch(condition[3]){
+        case "null": condition[3] = null; break;
+        case "false": condition[3] = false; break;
+        case "true": condition[3] = true; break;
+    }
 
     // for the conditional values we can use objects indicated by {@object.property@} on {{if:some-value:operator:value:OPTION1:OPTION2}}
     condition[4] = checkVariableInContent(condition[4], object);
@@ -102,15 +111,15 @@ function getValueFromConditional(str_condition, object){
     }
 }
 
-    // We check if condition values has reference to the object to get dynamic data
-    function checkVariableInContent(condition, object){
+// We check if condition values has reference to the object to get dynamic data
+function checkVariableInContent(condition, object){
 
-        // Check if the values contains expressions to evaluate expressed as {@object@} or {@object.property@}
-        var expr = condition.match(/{@(.*?)@}/);
+    // Check if the values contains expressions to evaluate expressed as {@object@} or {@object.property@}
+    var expr = condition.match(/{@(.*?)@}/);
 
-        // Replace the expression by its value found in the object or return the string as it is
-        return expr ? condition.replace(expr[0],getValueFromObject(expr[1], object)) : condition;
-    }
+    // Replace the expression by its value found in the object or return the string as it is
+    return expr ? condition.replace(expr[0],getValueFromObject(expr[1], object)) : condition;
+}
 
     // Gets the value from the data
     function getValueFromObject(str_property, object){
@@ -175,6 +184,67 @@ function getValueFromConditional(str_condition, object){
             }
             console.log("Error: " + str_compute + " is not a function");
         }
+    }
+
+    function applyIterates(str_html, object) {
+        // Creates dummy DOM to apply work with the template
+        var newHTMLDocument = document.implementation.createHTMLDocument('preview');
+        var $html = newHTMLDocument.createElement('div');
+
+        //Sets the HTML content to the new dummy div
+        $html.innerHTML = str_html;
+
+        // Search for iterations on the HTML code. We define iterates using a class <div class="dt-iterate" ...></div>
+        var $iterates = $html.querySelectorAll('.dt-iterate');
+
+        // We iterate through all iterations in the template
+        while($iterates.length) {
+
+            var $iterate = $html.querySelectorAll('.dt-iterate')[0];
+            // Avoid to repeat the iteration inside iterations remocing the attribute
+            $iterate.classList.remove('dt-iterate');
+
+            // We get the data object to iterate with
+            var iteration_data = $iterate.attributes["dt-data"].value.split(' in ');
+
+            // we set the template to use as the iteration but check if there's a component to use as template
+            var $template = $iterate;
+
+            if ($iterate.attributes["dt-component"] && $iterate.attributes["dt-component"].value) {
+                var $component = document.getElementById($iterate.attributes["dt-component"].value);
+                if (!$component) {
+                    console.error('Component not found!: ' + $iterate.attributes["dt-component"].value);
+                    return $html;
+                } else {
+                    $template = $component.cloneNode(true);
+                }
+            }
+
+            // iterate over the object array
+            // We use reduce to write every iteration to $temp_div
+            var iterations_html = getValueFromObject(iteration_data[1], object).reduce(function (iterations_html, element) {
+                // Creates a temp object that will be used on the iteration
+                var item = {};
+
+                // set the name to this object based in the expression 'item in items'. -> item.item = element
+                item[iteration_data[0]] = element;
+
+                // contactenates the new html created in this iteration into the one obtained in previous iterations
+                iterations_html += applyTemplate($template, item);
+
+                // Returns the HTML obtained in the iterations so far
+                return iterations_html;
+            }, '');
+
+            // Sets the result HTML string to the original template object when we found the .dt-iterate class
+            $iterate.parentNode.innerHTML = iterations_html;
+
+            // We check if there're some more iteration to apply
+            $iterates = $html.querySelectorAll('.dt-iterate');
+        }
+
+        // Returns the full HTML when all iterations finished
+        return $html.innerHTML;
     }
 
     window.dt = dynamicTemplate;

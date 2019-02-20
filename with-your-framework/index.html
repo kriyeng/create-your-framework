@@ -99,6 +99,10 @@
     <script type="text/javascript" src="js/dynamic-template.js"></script>
     <script type="text/javascript" src="js/app.js"></script>
 
+<script type="text/template" id="template-items">
+    <div class="dt-iterate" dt-data="item in items" dt-component="template-item"></div>
+</script>
+
 <script type="text/template" id="template-item">
     <div class="item panel {{if:item.type:==:photo:photo-class:video-class}}">
         <div class="image" style="background-image: url({{item.preview}})"></div>
